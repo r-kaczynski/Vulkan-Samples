@@ -33,7 +33,7 @@ namespace fs
 namespace path
 {
 const std::unordered_map<Type, std::string> relative_paths = {{Type::Assets, "assets/"},
-                                                              {Type::Shaders, "shaders/"},
+                                                              {Type::Shaders, "assets/shaders/"},
                                                               {Type::Storage, "output/"},
                                                               {Type::Screenshots, "output/images/"},
                                                               {Type::Logs, "output/logs/"},

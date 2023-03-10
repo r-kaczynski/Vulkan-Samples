@@ -24,7 +24,12 @@ VKBP_DISABLE_WARNINGS()
 #include <stb_image_write.h>
 VKBP_ENABLE_WARNINGS()
 
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+#include "platform/android/android_platform.h"
+#include <android/asset_manager.h>
+#else
 #include "platform/platform.h"
+#endif
 
 namespace vkb
 {
@@ -51,6 +56,10 @@ const std::string get(const Type type, const std::string &file)
 	else if (type == Type::Temp)
 	{
 		return Platform::get_temp_directory();
+	}
+	else if (type == Type::Shaders)
+	{
+		return "assets/shaders/";
 	}
 
 	// Check for relative paths
@@ -185,7 +194,20 @@ std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t coun
 
 std::string read_shader(const std::string &filename)
 {
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+	std::string filepath = path::get(path::Type::Shaders) + filename;
+	AAsset* asset = AAssetManager_open(android_asset_manager, filepath.c_str(), AASSET_MODE_STREAMING);
+	size_t size = AAsset_getLength(asset);
+
+	//void* assetData = static_cast<void*>(asset);
+	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
+	AAsset_read(asset, data.get(), size);
+	AAsset_close(asset);
+	std::string str = reinterpret_cast<char*>(data.get());
+	return str;
+#else
 	return read_text_file(path::get(path::Type::Shaders) + filename);
+#endif
 }
 
 std::vector<uint8_t> read_shader_binary(const std::string &filename)

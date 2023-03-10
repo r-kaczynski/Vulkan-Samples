@@ -401,6 +401,10 @@ void create_directory(const std::string &path)
 		mkdir(path.c_str(), 0777);
 	}
 }
+void set_asset_manager(AAssetManager* asset_manager)
+{
+	android_asset_manager = asset_manager;
+}
 }        // namespace fs
 
 AndroidPlatform::AndroidPlatform(android_app *app) :
@@ -433,6 +437,7 @@ ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins)
 		}
 	} while (!surface_ready);
 
+	set_asset_manager(get_activity()->assetManager);
 	return ExitCode::Success;
 }
 

@@ -27,10 +27,14 @@
 
 #include <json.hpp>
 
+class AAssetManager;
+
 namespace vkb
 {
 namespace fs
 {
+extern AAssetManager* android_asset_manager;
+
 namespace path
 {
 enum Type

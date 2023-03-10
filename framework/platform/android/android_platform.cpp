@@ -437,7 +437,7 @@ ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins)
 		}
 	} while (!surface_ready);
 
-	set_asset_manager(get_activity()->assetManager);
+	fs::set_asset_manager(get_activity()->assetManager);
 	return ExitCode::Success;
 }
 

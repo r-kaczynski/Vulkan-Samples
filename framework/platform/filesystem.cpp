@@ -24,7 +24,7 @@ VKBP_DISABLE_WARNINGS()
 #include <stb_image_write.h>
 VKBP_ENABLE_WARNINGS()
 
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+#if defined(__ANDROID__)
 #include "platform/android/android_platform.h"
 #include <android/asset_manager.h>
 #else
@@ -140,6 +140,19 @@ std::string read_text_file(const std::string &filename)
 
 std::vector<uint8_t> read_binary_file(const std::string &filename, const uint32_t count)
 {
+#if defined(__ANDROID__)
+	std::string filepath = path::get(path::Type::Shaders) + filename;
+	AAsset* asset = AAssetManager_open(android_asset_manager, filepath.c_str(), AASSET_MODE_STREAMING);
+	size_t size = AAsset_getLength(asset);
+	LOGI("reading %i bytes", size);
+	//void* assetData = static_cast<void*>(asset);
+	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
+	AAsset_read(asset, data.get(), size);
+	AAsset_close(asset);
+	std::vector<uint8_t> bytes;
+	bytes.assign(data.get(), data.get() + size);
+	return bytes;
+#else
 	std::vector<uint8_t> data;
 
 	std::ifstream file;
@@ -194,20 +207,7 @@ std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t coun
 
 std::string read_shader(const std::string &filename)
 {
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-	std::string filepath = path::get(path::Type::Shaders) + filename;
-	AAsset* asset = AAssetManager_open(android_asset_manager, filepath.c_str(), AASSET_MODE_STREAMING);
-	size_t size = AAsset_getLength(asset);
-
-	//void* assetData = static_cast<void*>(asset);
-	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
-	AAsset_read(asset, data.get(), size);
-	AAsset_close(asset);
-	std::string str = reinterpret_cast<char*>(data.get());
-	return str;
-#else
 	return read_text_file(path::get(path::Type::Shaders) + filename);
-#endif
 }
 
 std::vector<uint8_t> read_shader_binary(const std::string &filename)

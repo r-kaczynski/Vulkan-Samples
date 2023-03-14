@@ -33,7 +33,6 @@ namespace vkb
 {
 namespace fs
 {
-	//AAssetManager* android_asset_manager = nullptr;
 namespace path
 {
 const std::unordered_map<Type, std::string> relative_paths = {{Type::Assets, "assets/"},
@@ -56,6 +55,16 @@ const std::string get(const Type type, const std::string &file)
 	{
 		return Platform::get_temp_directory();
 	}
+#if defined(__ANDROID__)
+	if (type == Type::Assets)
+	{
+		return "" + file; //Because android asset manager's working directory is /assets
+	}
+	else if (type == Type::Shaders)
+	{
+		return "shaders/" + file;
+	}
+#endif
 
 	// Check for relative paths
 	auto it = relative_paths.find(type);
@@ -185,8 +194,7 @@ static void write_binary_file(const std::vector<uint8_t> &data, const std::strin
 std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t count)
 {
 #if defined(__ANDROID__)
-	LOGI(filename);
-	return AssetManager::read_binary_file(filename);
+	return AssetManager::read_binary_file(path::get(path::Type::Assets) + filename);
 #endif
 	return read_binary_file(path::get(path::Type::Assets) + filename, count);
 }
@@ -194,7 +202,7 @@ std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t coun
 std::string read_shader(const std::string &filename)
 {
 #if defined(__ANDROID__)
-	auto bytes = AssetManager::read_binary_file("shaders/" + filename);
+	auto bytes = AssetManager::read_binary_file(path::get(path::Type::Shaders) + filename);
 	return std::string(bytes.begin(), bytes.end());
 #endif
 	return read_text_file(path::get(path::Type::Shaders) + filename);
@@ -203,9 +211,19 @@ std::string read_shader(const std::string &filename)
 std::vector<uint8_t> read_shader_binary(const std::string &filename)
 {
 #if defined(__ANDROID__)
-	return AssetManager::read_binary_file("shaders/" + filename);
+	return AssetManager::read_binary_file(path::get(path::Type::Shaders) + filename);
 #endif
 	return read_binary_file(path::get(path::Type::Shaders) + filename, 0);
+}
+
+KTX_error_code read_ktx_file(const std::string &filename, ktxTexture **ktx_texture)
+{
+#if defined(__ANDROID__)
+	auto bytes = vkb::fs::AssetManager::read_binary_file(filename);
+	return ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, ktx_texture);
+#else
+	return ktxTexture_CreateFromNamedFile(file_name.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
+#endif
 }
 
 std::vector<uint8_t> read_temp(const std::string &filename, const uint32_t count)

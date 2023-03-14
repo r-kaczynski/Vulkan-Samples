@@ -402,10 +402,6 @@ void create_directory(const std::string &path)
 		mkdir(path.c_str(), 0777);
 	}
 }
-//void set_asset_manager(AAssetManager* asset_manager)
-//{
-	//android_asset_manager = asset_manager;
-//}
 }        // namespace fs
 
 AndroidPlatform::AndroidPlatform(android_app *app) :
@@ -419,13 +415,13 @@ ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins)
 	app->onInputEvent                              = on_input_event;
 	app->activity->callbacks->onContentRectChanged = on_content_rect_changed;
 	app->userData                                  = this;
+
 	auto code = Platform::initialize(plugins);
 	if (code != ExitCode::Success)
 	{
 		return code;
 	}
 
-	//fs::set_asset_manager(get_activity()->assetManager);
 	fs::AssetManager::set_android_asset_manager(get_activity()->assetManager);
 	// Wait until the android window is loaded before allowing the app to continue
 	LOGI("Waiting on window surface to be ready");

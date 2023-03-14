@@ -88,13 +88,8 @@ void TextureLoading::load_texture()
 
 	ktxTexture    *ktx_texture;
 	KTX_error_code result;
+	result = vkb::fs::read_ktx_file(filename, &ktx_texture);
 
-#if defined(__ANDROID__)
-	auto bytes = vkb::fs::AssetManager::read_binary_file("textures/metalplate01_rgba.ktx");
-	result = ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
-#else
-	result = ktxTexture_CreateFromNamedFile(filename.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
-#endif
 	if (ktx_texture == nullptr)
 	{
 		throw std::runtime_error("Couldn't load texture");

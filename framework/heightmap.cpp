@@ -39,12 +39,7 @@ HeightMap::HeightMap(const std::string &file_name, const uint32_t patchsize)
 
 	ktxTexture *ktx_texture;
 	ktxResult   ktx_result;
-	ktx_result = ktxTexture_CreateFromNamedFile(file_path.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
-#if defined(__ANDROID__)
-	auto bytes = fs::AssetManager::read_binary_file(file_name.c_str());
-	ktx_result = ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
-#endif
-
+	ktx_result = vkb::fs::read_ktx_file(file_path, &ktx_texture);
 	assert(ktx_result == KTX_SUCCESS);
 
 	ktx_size_t   ktx_size  = ktxTexture_GetImageSize(ktx_texture, 0);

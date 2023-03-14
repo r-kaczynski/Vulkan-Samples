@@ -32,6 +32,7 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 #include "apps.h"
+#include "asset_manager.h"
 #include "common/logging.h"
 #include "common/strings.h"
 #include "platform/android/android_window.h"
@@ -401,10 +402,10 @@ void create_directory(const std::string &path)
 		mkdir(path.c_str(), 0777);
 	}
 }
-void set_asset_manager(AAssetManager* asset_manager)
-{
-	android_asset_manager = asset_manager;
-}
+//void set_asset_manager(AAssetManager* asset_manager)
+//{
+	//android_asset_manager = asset_manager;
+//}
 }        // namespace fs
 
 AndroidPlatform::AndroidPlatform(android_app *app) :
@@ -418,13 +419,14 @@ ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins)
 	app->onInputEvent                              = on_input_event;
 	app->activity->callbacks->onContentRectChanged = on_content_rect_changed;
 	app->userData                                  = this;
-
 	auto code = Platform::initialize(plugins);
 	if (code != ExitCode::Success)
 	{
 		return code;
 	}
 
+	//fs::set_asset_manager(get_activity()->assetManager);
+	fs::AssetManager::set_android_asset_manager(get_activity()->assetManager);
 	// Wait until the android window is loaded before allowing the app to continue
 	LOGI("Waiting on window surface to be ready");
 	do
@@ -437,7 +439,6 @@ ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins)
 		}
 	} while (!surface_ready);
 
-	fs::set_asset_manager(get_activity()->assetManager);
 	return ExitCode::Success;
 }
 

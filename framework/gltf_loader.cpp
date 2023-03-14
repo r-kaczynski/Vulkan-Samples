@@ -17,6 +17,10 @@
  */
 
 #define TINYGLTF_IMPLEMENTATION
+#if defined(__ANDROID__)
+#include "platform/android/asset_manager.h"
+#define TINYGLTF_ANDROID_LOAD_FROM_ASSETS
+#endif
 #include "gltf_loader.h"
 
 #include <limits>
@@ -365,7 +369,12 @@ std::unique_ptr<sg::Scene> GLTFLoader::read_scene_from_file(const std::string &f
 
 	tinygltf::TinyGLTF gltf_loader;
 
+#if defined(TINYGLTF_ANDROID_LOAD_FROM_ASSETS)
+	std::string gltf_file = file_name;
+	tinygltf::asset_manager = vkb::fs::AssetManager::get_android_asset_manager();
+#else
 	std::string gltf_file = vkb::fs::path::get(vkb::fs::path::Type::Assets) + file_name;
+#endif
 
 	bool importResult = gltf_loader.LoadASCIIFromFile(&model, &err, &warn, gltf_file.c_str());
 
@@ -407,7 +416,12 @@ std::unique_ptr<sg::SubMesh> GLTFLoader::read_model_from_file(const std::string 
 
 	tinygltf::TinyGLTF gltf_loader;
 
+#if defined(TINYGLTF_ANDROID_LOAD_FROM_ASSETS)
+	std::string gltf_file = file_name;
+	tinygltf::asset_manager = vkb::fs::AssetManager::get_android_asset_manager();
+#else
 	std::string gltf_file = vkb::fs::path::get(vkb::fs::path::Type::Assets) + file_name;
+#endif
 
 	bool importResult = gltf_loader.LoadASCIIFromFile(&model, &err, &warn, gltf_file.c_str());
 

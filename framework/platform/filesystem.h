@@ -27,13 +27,13 @@
 
 #include <json.hpp>
 
-class AAssetManager;
+//class AAssetManager;
 
 namespace vkb
 {
 namespace fs
 {
-extern AAssetManager* android_asset_manager;
+//extern AAssetManager* android_asset_manager;
 
 namespace path
 {

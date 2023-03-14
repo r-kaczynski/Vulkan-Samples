@@ -22,6 +22,10 @@
 #include "scene_graph/components/material.h"
 #include "scene_graph/components/mesh.h"
 
+#if defined(__ANDROID__)
+#include "../framework/platform/android/asset_manager.h"
+#endif
+
 namespace
 {
 constexpr std::array<const char *, 19> error_codes = {
@@ -48,6 +52,7 @@ constexpr std::array<const char *, 19> error_codes = {
 
 std::string get_sponza_texture_filename(const std::string &short_name)
 {
+	return "scenes/sponza/ktx2/" + short_name + "2";
 	return vkb::fs::path::get(vkb::fs::path::Type::Assets) + "scenes/sponza/ktx2/" + short_name + "2";
 }
 }        // namespace
@@ -368,7 +373,12 @@ std::vector<uint8_t> TextureCompressionComparison::get_raw_image(const std::stri
 std::pair<std::unique_ptr<vkb::sg::Image>, TextureCompressionComparison::TextureBenchmark> TextureCompressionComparison::compress(const std::string &filename, TextureCompressionComparison::CompressedTexture_t texture_format, const std::string &name)
 {
 	ktxTexture2 *ktx_texture{nullptr};
+#if defined(__ANDROID__)
+	auto bytes = vkb::fs::AssetManager::read_binary_file(filename);
+	KTX_CHECK(ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, reinterpret_cast<ktxTexture **>(&ktx_texture)));
+#else
 	KTX_CHECK(ktxTexture2_CreateFromNamedFile(filename.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture));
+#endif
 
 	TextureBenchmark benchmark;
 	{

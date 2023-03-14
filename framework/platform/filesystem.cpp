@@ -25,20 +25,19 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 #if defined(__ANDROID__)
-#include "platform/android/android_platform.h"
-#include <android/asset_manager.h>
-#else
-#include "platform/platform.h"
+#include "platform/android/asset_manager.h"
 #endif
+#include "platform/platform.h"
 
 namespace vkb
 {
 namespace fs
 {
+	//AAssetManager* android_asset_manager = nullptr;
 namespace path
 {
 const std::unordered_map<Type, std::string> relative_paths = {{Type::Assets, "assets/"},
-                                                              {Type::Shaders, "assets/shaders/"},
+                                                              {Type::Shaders, "shaders/"},
                                                               {Type::Storage, "output/"},
                                                               {Type::Screenshots, "output/images/"},
                                                               {Type::Logs, "output/logs/"},
@@ -56,10 +55,6 @@ const std::string get(const Type type, const std::string &file)
 	else if (type == Type::Temp)
 	{
 		return Platform::get_temp_directory();
-	}
-	else if (type == Type::Shaders)
-	{
-		return "assets/shaders/";
 	}
 
 	// Check for relative paths
@@ -140,19 +135,6 @@ std::string read_text_file(const std::string &filename)
 
 std::vector<uint8_t> read_binary_file(const std::string &filename, const uint32_t count)
 {
-#if defined(__ANDROID__)
-	std::string filepath = path::get(path::Type::Shaders) + filename;
-	AAsset* asset = AAssetManager_open(android_asset_manager, filepath.c_str(), AASSET_MODE_STREAMING);
-	size_t size = AAsset_getLength(asset);
-	LOGI("reading %i bytes", size);
-	//void* assetData = static_cast<void*>(asset);
-	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
-	AAsset_read(asset, data.get(), size);
-	AAsset_close(asset);
-	std::vector<uint8_t> bytes;
-	bytes.assign(data.get(), data.get() + size);
-	return bytes;
-#else
 	std::vector<uint8_t> data;
 
 	std::ifstream file;
@@ -202,16 +184,27 @@ static void write_binary_file(const std::vector<uint8_t> &data, const std::strin
 
 std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t count)
 {
+#if defined(__ANDROID__)
+	LOGI(filename);
+	return AssetManager::read_binary_file(filename);
+#endif
 	return read_binary_file(path::get(path::Type::Assets) + filename, count);
 }
 
 std::string read_shader(const std::string &filename)
 {
+#if defined(__ANDROID__)
+	auto bytes = AssetManager::read_binary_file("shaders/" + filename);
+	return std::string(bytes.begin(), bytes.end());
+#endif
 	return read_text_file(path::get(path::Type::Shaders) + filename);
 }
 
 std::vector<uint8_t> read_shader_binary(const std::string &filename)
 {
+#if defined(__ANDROID__)
+	return AssetManager::read_binary_file("shaders/" + filename);
+#endif
 	return read_binary_file(path::get(path::Type::Shaders) + filename, 0);
 }
 

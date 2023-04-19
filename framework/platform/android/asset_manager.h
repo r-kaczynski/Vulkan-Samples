@@ -1,4 +1,4 @@
-
+#pragma once
 #include <android/asset_manager.h>
 
 #include <string>
@@ -7,7 +7,7 @@ namespace vkb
 {
 namespace fs
 {
-class AssetManager
+class AssetManager final
 {
     public:
         // Singleton class

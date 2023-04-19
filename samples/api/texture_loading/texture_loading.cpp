@@ -21,10 +21,6 @@
 
 #include "texture_loading.h"
 
-#if defined(__ANDROID__)
-#include "../framework/platform/android/asset_manager.h"
-#endif
-
 TextureLoading::TextureLoading()
 {
 	zoom     = -2.5f;
@@ -88,6 +84,7 @@ void TextureLoading::load_texture()
 
 	ktxTexture    *ktx_texture;
 	KTX_error_code result;
+	
 	result = vkb::fs::read_ktx_file(filename, &ktx_texture);
 
 	if (ktx_texture == nullptr)

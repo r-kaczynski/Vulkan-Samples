@@ -22,9 +22,6 @@
 #include "scene_graph/components/material.h"
 #include "scene_graph/components/mesh.h"
 
-#if defined(__ANDROID__)
-#include "../framework/platform/android/asset_manager.h"
-#endif
 
 namespace
 {

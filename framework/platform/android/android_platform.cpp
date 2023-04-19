@@ -32,10 +32,10 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 #include "apps.h"
-#include "asset_manager.h"
 #include "common/logging.h"
 #include "common/strings.h"
 #include "platform/android/android_window.h"
+#include "platform/android/asset_manager.h"
 #include "platform/input_events.h"
 
 extern "C"

@@ -24,9 +24,6 @@ VKBP_DISABLE_WARNINGS()
 #include <stb_image_write.h>
 VKBP_ENABLE_WARNINGS()
 
-#if defined(__ANDROID__)
-#include "platform/android/asset_manager.h"
-#endif
 #include "platform/platform.h"
 
 namespace vkb
@@ -56,9 +53,9 @@ const std::string get(const Type type, const std::string &file)
 		return Platform::get_temp_directory();
 	}
 #if defined(__ANDROID__)
-	if (type == Type::Assets)
+	else if (type == Type::Assets)
 	{
-		return "" + file; //Because android asset manager's working directory is /assets
+		return file; //Because android asset manager's working directory is /assets
 	}
 	else if (type == Type::Shaders)
 	{
@@ -195,31 +192,34 @@ std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t coun
 {
 #if defined(__ANDROID__)
 	return AssetManager::read_binary_file(path::get(path::Type::Assets) + filename);
-#endif
+#else
 	return read_binary_file(path::get(path::Type::Assets) + filename, count);
+#endif
 }
 
 std::string read_shader(const std::string &filename)
 {
 #if defined(__ANDROID__)
-	auto bytes = AssetManager::read_binary_file(path::get(path::Type::Shaders) + filename);
+	const auto& bytes = AssetManager::read_binary_file(path::get(path::Type::Shaders) + filename);
 	return std::string(bytes.begin(), bytes.end());
-#endif
+#else
 	return read_text_file(path::get(path::Type::Shaders) + filename);
+#endif
 }
 
 std::vector<uint8_t> read_shader_binary(const std::string &filename)
 {
 #if defined(__ANDROID__)
 	return AssetManager::read_binary_file(path::get(path::Type::Shaders) + filename);
-#endif
+#else
 	return read_binary_file(path::get(path::Type::Shaders) + filename, 0);
+#endif
 }
 
 KTX_error_code read_ktx_file(const std::string &filename, ktxTexture **ktx_texture)
 {
 #if defined(__ANDROID__)
-	auto bytes = vkb::fs::AssetManager::read_binary_file(filename);
+	const auto& bytes = vkb::fs::AssetManager::read_binary_file(filename);
 	return ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, ktx_texture);
 #else
 	return ktxTexture_CreateFromNamedFile(file_name.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);

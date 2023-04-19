@@ -21,9 +21,7 @@
 
 #include "texture_compression_basisu.h"
 
-#if defined(__ANDROID__)
-#include "../framework/platform/android/asset_manager.h"
-#endif
+
 
 TextureCompressionBasisu::TextureCompressionBasisu()
 {

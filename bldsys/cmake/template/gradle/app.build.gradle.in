@@ -52,7 +52,6 @@ android {
 			@RES_SRC_DIRS@
 			@JAVA_SRC_DIRS@
 			@JNI_LIBS_SRC_DIRS@
-			@ANROID_ASSETS_SRC_DIRS@
 			@MANIFEST_FILE@
 		}
 	}

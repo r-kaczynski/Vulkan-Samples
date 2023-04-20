@@ -84,7 +84,6 @@ endif()
 set(ASSETS_LIST)
 
 foreach(ASSET_DIR ${ASSET_DIRS})
-	message("${ASSET_DIR}")
 	if(NOT IS_ABSOLUTE ${ASSET_DIR})
 		set(ASSET_DIR ${CMAKE_SOURCE_DIR}/${ASSET_DIR})
 	endif()
